@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Message Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #333;
+            height: 100vh;
+            display: flex;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem;
+            background-color: #e0e7ff;
+            border-radius: 0.5rem;
+            margin: 1rem;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .top-bar {
+            background-color: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .message-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Message List Styles */
+        .message-list {
+            width: 33%;
+            background-color: white;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+        }
+        
+        .message-list-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .message-card {
+            padding: 1rem;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .message-card:hover {
+            background-color: #f8fafc;
+        }
+        
+        .message-card.selected {
+            background-color: #e0e7ff;
+        }
+        
+        .priority-high {
+            border-left-color: #ef4444;
+        }
+        
+        .priority-medium {
+            border-left-color: #f59e0b;
+        }
+        
+        .priority-low {
+            border-left-color: #10b981;
+        }
+        
+        /* Message Detail Styles */
+        .message-detail {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        .message-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .message-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        
+        /* AI Assistant Styles */
+        .ai-section {
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        
+        .ai-response {
+            background-color: #f5f7fd;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Reply Section Styles */
+        .reply-section {
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        
+        /* Utility Classes */
+        .flex {
+            display: flex;
+        }
+        
+        .flex-col {
+            flex-direction: column;
+        }
+        
+        .flex-1 {
+            flex: 1;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .space-x-2 > * + * {
+            margin-left: 0.5rem;
+        }
+        
+        .space-x-3 > * + * {
+            margin-left: 0.75rem;
+        }
+        
+        .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+        
+        .p-1 {
+            padding: 0.25rem;
+        }
+        
+        .p-2 {
+            padding: 0.5rem;
+        }
+        
+        .p-3 {
+            padding: 0.75rem;
+        }
+        
+        .p-4 {
+            padding: 1rem;
+        }
+        
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+        
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+        
+        .mr-3 {
+            margin-right: 0.75rem;
+        }
+        
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        
+        .rounded-full {
+            border-radius: 9999px;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .text-xs {
+            font-size: 0.75rem;
+        }
+        
+        .font-medium {
+            font-weight: 500;
+        }
+        
+        .font-semibold {
+            font-weight: 600;
+        }
+        
+        .font-bold {
+            font-weight: 700;
+        }
+        
+        .text-gray-500 {
+            color: #64748b;
+        }
+        
+        .text-gray-700 {
+            color: #334155;
+        }
+        
+        .text-gray-800 {
+            color: #1e293b;
+        }
+        
+        .text-gray-900 {
+            color: #0f172a;
+        }
+        
+        .text-blue-600 {
+            color: #2563eb;
+        }
+        
+        .bg-blue-50 {
+            background-color: #eff6ff;
+        }
+        
+        .bg-blue-100 {
+            background-color: #dbeafe;
+        }
+        
+        .bg-blue-600 {
+            background-color: #2563eb;
+        }
+        
+        .hover\:bg-blue-700:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .bg-white {
+            background-color: white;
+        }
+        
+        .bg-gray-100 {
+            background-color: #f1f5f9;
+        }
+        
+        .hover\:bg-gray-100:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .border {
+            border: 1px solid #e2e8f0;
+        }
+        
+        .border-gray-200 {
+            border-color: #e2e8f0;
+        }
+        
+        .border-gray-300 {
+            border-color: #cbd5e1;
+        }
+        
+        /* Category Tags */
+        .category-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+        }
+        
+        .category-work {
+            background-color: #e0e7ff;
+            color: #2563eb;
+        }
+        
+        .category-personal {
+            background-color: #ecfdf5;
+            color: #059669;
+        }
+        
+        .category-newsletters {
+            background-color: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .category-social {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+        
+        /* Unread Dot */
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #2563eb;
+            border-radius: 50%;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+        }
+        
+        /* Form Elements */
+        .input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            width: 100%;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        
+        .textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            resize: none;
+        }
+        
+        .textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        /* Avatar */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -250px;
+                top: 0;
+                bottom: 0;
+                z-index: 100;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+            
+            .message-list {
+                width: 100%;
+            }
+            
+            .message-detail {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                bottom: 0;
+                width: 100%;
+                z-index: 100;
+                transition: right 0.3s ease;
+            }
+            
+            .message-detail.open {
+                right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="font-bold text-gray-800">
+                <i class="fas fa-robot text-blue-600 mr-2"></i>Message AI
+            </h1>
+        </div>
+        
+        <div class="sidebar-content">
+            <div class="mb-4">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Inboxes</h3>
+                <ul>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                            <i class="fas fa-inbox mr-3"></i>All Messages
+                            <span class="ml-auto bg-blue-600 text-white px-2 py-1 rounded-full text-xs">42</span>
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-envelope mr-3"></i>Email
+                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">24</span>
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-comment-dots mr-3"></i>Messengers
+                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">18</span>
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-bell mr-3"></i>Notifications
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-4">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Categories</h3>
+                <ul>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-briefcase mr-3 text-blue-600"></i>Work
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-user mr-3 text-green-600"></i>Personal
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-newspaper mr-3 text-red-600"></i>Newsletters
+                        </button>
+                    </li>
+                    <li class="mb-1">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-users mr-3 text-yellow-600"></i>Social
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-4">
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Important</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Follow up</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Meetings</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Urgent</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Finance</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <h3 class="font-medium text-blue-800 mb-2">AI Suggestions</h3>
+            <p class="text-sm text-blue-700 mb-3">You have 12 messages that need replies. Want me to draft responses?</p>
+            <button class="btn btn-primary w-full">
+                Generate Replies
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="flex items-center">
+                <button class="mr-4 text-gray-500 md:hidden" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="relative w-64">
+                    <input type="text" placeholder="Search messages..." class="input pl-10">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-sort"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Message Container -->
+        <div class="message-container">
+            <!-- Message List -->
+            <div class="message-list" id="messageList">
+                <div class="message-list-header">
+                    <h2 class="font-semibold text-gray-800">All Messages</h2>
+                    <span class="text-sm text-gray-500">42 unread</span>
+                </div>
+                
+                <div class="divide-y divide-gray-200">
+                    <!-- Message 1 -->
+                    <div class="message-card priority-high" data-message-id="1">
+                        <div class="flex items-start">
+                            <div class="avatar bg-blue-100 mr-3">
+                                <i class="fas fa-user text-blue-600"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between">
+                                    <p class="font-medium text-gray-900 truncate">Sarah Johnson</p>
+                                    <span class="text-xs text-gray-500">2h ago</span>
+                                </div>
+                                <p class="text-sm text-gray-500 truncate">Project deadline moved up to Friday</p>
+                                <div class="flex mt-1 space-x-2">
+                                    <span class="category-tag category-work">Work</span>
+                                    <span class="unread-dot"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Message 2 -->
+                    <div class="message-card priority-medium" data-message-id="2">
+                        <div class="flex items-start">
+                            <div class="avatar bg-purple-100 mr-3">
+                                <i class="fas fa-users text-purple-600"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between">
+                                    <p class="font-medium text-gray-900 truncate">Marketing Team</p>
+                                    <span class="text-xs text-gray-500">5h ago</span>
+                                </div>
+                                <p class="text-sm text-gray-500 truncate">New campaign analytics ready for review</p>
+                                <div class="flex mt-1 space-x-2">
+                                    <span class="category-tag category-work">Work</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Message 3 -->
+                    <div class="message-card priority-low" data-message-id="3">
+                        <div class="flex items-start">
+                            <div class="avatar bg-green-100 mr-3">
+                                <i class="fas fa-user text-green-600"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between">
+                                    <p class="font-medium text-gray-900 truncate">Mom</p>
+                                    <span class="text-xs text-gray-500">1d ago</span>
+                                </div>
+                                <p class="text-sm text-gray-500 truncate">Check out these photos from our trip!</p>
+         
