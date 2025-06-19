@@ -467,6 +467,41 @@
                 right: 0;
             }
         }
+
+        /* Loading spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -483,25 +518,25 @@
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Inboxes</h3>
                 <ul>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg bg-blue-50 text-blue-600 font-medium" data-inbox="all">
                             <i class="fas fa-inbox mr-3"></i>All Messages
-                            <span class="ml-auto bg-blue-600 text-white px-2 py-1 rounded-full text-xs">42</span>
+                            <span class="ml-auto bg-blue-600 text-white px-2 py-1 rounded-full text-xs" id="allMessagesCount">42</span>
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-inbox="email">
                             <i class="fas fa-envelope mr-3"></i>Email
-                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">24</span>
+                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs" id="emailCount">24</span>
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-inbox="messenger">
                             <i class="fas fa-comment-dots mr-3"></i>Messengers
-                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">18</span>
+                            <span class="ml-auto bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs" id="messengerCount">18</span>
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-inbox="notification">
                             <i class="fas fa-bell mr-3"></i>Notifications
                         </button>
                     </li>
@@ -512,22 +547,22 @@
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Categories</h3>
                 <ul>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-category="work">
                             <i class="fas fa-briefcase mr-3 text-blue-600"></i>Work
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-category="personal">
                             <i class="fas fa-user mr-3 text-green-600"></i>Personal
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-category="newsletters">
                             <i class="fas fa-newspaper mr-3 text-red-600"></i>Newsletters
                         </button>
                     </li>
                     <li class="mb-1">
-                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700">
+                        <button class="btn w-full flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-700" data-category="social">
                             <i class="fas fa-users mr-3 text-yellow-600"></i>Social
                         </button>
                     </li>
@@ -537,19 +572,19 @@
             <div class="mb-4">
                 <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Tags</h3>
                 <div class="flex flex-wrap gap-2">
-                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Important</span>
-                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Follow up</span>
-                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Meetings</span>
-                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Urgent</span>
-                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Finance</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs cursor-pointer" data-tag="important">Important</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs cursor-pointer" data-tag="follow-up">Follow up</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs cursor-pointer" data-tag="meetings">Meetings</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs cursor-pointer" data-tag="urgent">Urgent</span>
+                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs cursor-pointer" data-tag="finance">Finance</span>
                 </div>
             </div>
         </div>
         
         <div class="sidebar-footer">
             <h3 class="font-medium text-blue-800 mb-2">AI Suggestions</h3>
-            <p class="text-sm text-blue-700 mb-3">You have 12 messages that need replies. Want me to draft responses?</p>
-            <button class="btn btn-primary w-full">
+            <p class="text-sm text-blue-700 mb-3" id="unrepliedCount">You have 12 messages that need replies. Want me to draft responses?</p>
+            <button class="btn btn-primary w-full" id="generateAllReplies">
                 Generate Replies
             </button>
         </div>
@@ -564,19 +599,19 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="relative w-64">
-                    <input type="text" placeholder="Search messages..." class="input pl-10">
+                    <input type="text" placeholder="Search messages..." class="input pl-10" id="searchInput">
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
             </div>
             
             <div class="flex items-center space-x-4">
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="filterToggle">
                     <i class="fas fa-filter"></i>
                 </button>
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="sortToggle">
                     <i class="fas fa-sort"></i>
                 </button>
-                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="moreOptions">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
             </div>
@@ -587,107 +622,12 @@
             <!-- Message List -->
             <div class="message-list" id="messageList">
                 <div class="message-list-header">
-                    <h2 class="font-semibold text-gray-800">All Messages</h2>
-                    <span class="text-sm text-gray-500">42 unread</span>
+                    <h2 class="font-semibold text-gray-800" id="messageListTitle">All Messages</h2>
+                    <span class="text-sm text-gray-500" id="unreadCount">42 unread</span>
                 </div>
                 
-                <div class="divide-y divide-gray-200">
-                    <!-- Message 1 -->
-                    <div class="message-card priority-high" data-message-id="1">
-                        <div class="flex items-start">
-                            <div class="avatar bg-blue-100 mr-3">
-                                <i class="fas fa-user text-blue-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between">
-                                    <p class="font-medium text-gray-900 truncate">Sarah Johnson</p>
-                                    <span class="text-xs text-gray-500">2h ago</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">Project deadline moved up to Friday</p>
-                                <div class="flex mt-1 space-x-2">
-                                    <span class="category-tag category-work">Work</span>
-                                    <span class="unread-dot"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Message 2 -->
-                    <div class="message-card priority-medium" data-message-id="2">
-                        <div class="flex items-start">
-                            <div class="avatar bg-purple-100 mr-3">
-                                <i class="fas fa-users text-purple-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between">
-                                    <p class="font-medium text-gray-900 truncate">Marketing Team</p>
-                                    <span class="text-xs text-gray-500">5h ago</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">New campaign analytics ready for review</p>
-                                <div class="flex mt-1 space-x-2">
-                                    <span class="category-tag category-work">Work</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Message 3 -->
-                    <div class="message-card priority-low" data-message-id="3">
-                        <div class="flex items-start">
-                            <div class="avatar bg-green-100 mr-3">
-                                <i class="fas fa-user text-green-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between">
-                                    <p class="font-medium text-gray-900 truncate">Mom</p>
-                                    <span class="text-xs text-gray-500">1d ago</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">Check out these photos from our trip!</p>
-                                <div class="flex mt-1 space-x-2">
-                                    <span class="category-tag category-personal">Personal</span>
-                                    <span class="unread-dot"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Message 4 -->
-                    <div class="message-card" data-message-id="4">
-                        <div class="flex items-start">
-                            <div class="avatar bg-red-100 mr-3">
-                                <i class="fas fa-newspaper text-red-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between">
-                                    <p class="font-medium text-gray-900 truncate">Tech Digest</p>
-                                    <span class="text-xs text-gray-500">1d ago</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">This week's top tech stories - AI breakthroughs</p>
-                                <div class="flex mt-1 space-x-2">
-                                    <span class="category-tag category-newsletters">Newsletter</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Message 5 -->
-                    <div class="message-card" data-message-id="5">
-                        <div class="flex items-start">
-                            <div class="avatar bg-yellow-100 mr-3">
-                                <i class="fas fa-users text-yellow-600"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between">
-                                    <p class="font-medium text-gray-900 truncate">College Friends</p>
-                                    <span class="text-xs text-gray-500">2d ago</span>
-                                </div>
-                                <p class="text-sm text-gray-500 truncate">Reunion planning next month - who's coming?</p>
-                                <div class="flex mt-1 space-x-2">
-                                    <span class="category-tag category-social">Social</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="divide-y divide-gray-200" id="messageCardsContainer">
+                    <!-- Messages will be dynamically inserted here -->
                 </div>
             </div>
             
@@ -696,15 +636,15 @@
                 <!-- Message Header -->
                 <div class="message-header">
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xl font-bold text-gray-800">Project deadline moved up to Friday</h2>
+                        <h2 class="text-xl font-bold text-gray-800" id="messageSubject">Project deadline moved up to Friday</h2>
                         <div class="flex space-x-2">
-                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="archiveBtn">
                                 <i class="fas fa-archive"></i>
                             </button>
-                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="deleteBtn">
                                 <i class="fas fa-trash"></i>
                             </button>
-                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600">
+                            <button class="p-2 rounded-full hover:bg-gray-100 text-gray-600" id="moreActions">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                         </div>
@@ -712,85 +652,29 @@
                     
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <div class="avatar bg-blue-100 mr-3">
+                            <div class="avatar bg-blue-100 mr-3" id="senderAvatar">
                                 <i class="fas fa-user text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="font-medium text-gray-900">Sarah Johnson</p>
-                                <p class="text-sm text-gray-500">sarah.johnson@company.com</p>
+                                <p class="font-medium text-gray-900" id="senderName">Sarah Johnson</p>
+                                <p class="text-sm text-gray-500" id="senderEmail">sarah.johnson@company.com</p>
                             </div>
                         </div>
-                        <span class="text-sm text-gray-500">Today at 2:45 PM</span>
+                        <span class="text-sm text-gray-500" id="messageTime">Today at 2:45 PM</span>
                     </div>
                 </div>
                 
                 <!-- Message Content -->
-                <div class="message-content">
-                    <p>Hi there,</p>
-                    
-                    <p class="my-4">I wanted to let you know that the deadline for the client project has been moved up to this Friday instead of next Monday. The client needs the deliverables earlier because of their upcoming board meeting.</p>
-                    
-                    <p class="my-4">I know this is a tight turnaround, but I've spoken with the design team and they can adjust their schedules to prioritize this. Let me know if you'll need any additional resources to make this happen.</p>
-                    
-                    <p class="my-4">We can discuss more in tomorrow's standup, but I wanted to give you the heads up as soon as possible.</p>
-                    
-                    <p>Best,<br>
-                    Sarah</p>
-                    
-                    <div class="mt-8 p-4 border border-gray-200 rounded-lg">
-                        <h3 class="font-bold text-gray-800 mb-2">Attachments</h3>
-                        <div class="flex space-x-4">
-                            <div class="flex items-center p-2 border border-gray-200 rounded-lg">
-                                <i class="fas fa-file-word text-blue-500 mr-2"></i>
-                                <span class="text-sm">Project_Brief.docx</span>
-                            </div>
-                            <div class="flex items-center p-2 border border-gray-200 rounded-lg">
-                                <i class="fas fa-file-pdf text-red-500 mr-2"></i>
-                                <span class="text-sm">Timeline_Update.pdf</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="message-content" id="messageBody">
+                    <!-- Message content will be dynamically inserted here -->
                 </div>
                 
                 <!-- AI Assistant Section -->
-                <div class="ai-section">
+                <div class="ai-section" id="aiSection">
                     <h3 class="font-semibold text-gray-800 mb-3">AI Assistant</h3>
                     
-                    <div class="space-y-4">
-                        <div class="flex items-start">
-                            <div class="bg-blue-100 p-2 rounded-full mr-3">
-                                <i class="fas fa-lightbulb text-blue-600"></i>
-                            </div>
-                            <div class="ai-response flex-1">
-                                <p class="text-sm text-gray-800">This message is marked as high priority because it contains a deadline change. Would you like me to:</p>
-                                <div class="flex space-x-2 mt-2">
-                                    <button class="btn btn-primary text-xs px-3 py-1">Suggest Reply</button>
-                                    <button class="btn btn-secondary text-xs px-3 py-1">Calendar Alert</button>
-                                    <button class="btn btn-secondary text-xs px-3 py-1">Follow Up Reminder</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start">
-                            <div class="bg-green-100 p-2 rounded-full mr-3">
-                                <i class="fas fa-robot text-green-600"></i>
-                            </div>
-                            <div class="ai-response flex-1">
-                                <p class="text-sm text-gray-800">Here's a suggested reply you can use or modify:</p>
-                                <div class="bg-white p-3 rounded-lg border border-gray-200 mt-2">
-                                    <p>Hi Sarah,</p>
-                                    <p class="my-2">Thanks for the heads up about the deadline change. I've reviewed the updated documents and will adjust my schedule accordingly to meet the Friday deadline.</p>
-                                    <p class="my-2">I may need to coordinate with the QA team to prioritize their review - could you send an email to Mark to confirm their availability?</p>
-                                    <p class="my-2">Best,<br>
-                                    [Your Name]</p>
-                                </div>
-                                <div class="flex space-x-2 mt-2">
-                                    <button class="btn btn-primary text-xs px-3 py-1">Use This</button>
-                                    <button class="btn btn-secondary text-xs px-3 py-1">Regenerate</button>
-                                    <button class="btn btn-secondary text-xs px-3 py-1">Edit</button>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="space-y-4" id="aiSuggestions">
+                        <!-- AI suggestions will be dynamically inserted here -->
                     </div>
                 </div>
                 
@@ -802,17 +686,17 @@
                         </div>
                         <div class="flex-1">
                             <div class="border border-gray-300 rounded-lg overflow-hidden">
-                                <textarea rows="3" placeholder="Write your reply..." class="textarea"></textarea>
+                                <textarea rows="3" placeholder="Write your reply..." class="textarea" id="replyTextarea"></textarea>
                                 <div class="bg-gray-50 p-2 flex justify-between items-center">
                                     <div class="flex space-x-2">
-                                        <button class="p-1 text-gray-500 hover:text-gray-700">
+                                        <button class="p-1 text-gray-500 hover:text-gray-700" id="attachFileBtn">
                                             <i class="fas fa-paperclip"></i>
                                         </button>
-                                        <button class="p-1 text-gray-500 hover:text-gray-700">
+                                        <button class="p-1 text-gray-500 hover:text-gray-700" id="emojiBtn">
                                             <i class="fas fa-smile"></i>
                                         </button>
                                     </div>
-                                    <button class="btn btn-primary px-4 py-2 text-sm">
+                                    <button class="btn btn-primary px-4 py-2 text-sm" id="sendReplyBtn">
                                         Send
                                     </button>
                                 </div>
@@ -823,46 +707,328 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
     
     <script>
-        // Mobile menu toggle
-        document.getElementById('menuToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
-        
-        // Message card selection
-        const messageCards = document.querySelectorAll('.message-card');
-        const messageDetail = document.getElementById('messageDetail');
-        
-        messageCards.forEach(card => {
-            card.addEventListener('click', function() {
-                // Remove selection from all cards
-                messageCards.forEach(c => c.classList.remove('selected'));
-                
-                // Add selection to clicked card
-                this.classList.add('selected');
-                
-                // Show message detail (mobile only)
-                if (window.innerWidth <= 768) {
-                    messageDetail.classList.add('open');
-                }
-            });
-        });
-        
-        // Close message detail on mobile
-        document.addEventListener('click', function(e) {
-           if (window.innerWidth <= 768 && !messageDetail.contains(e.target)) {
-                const isMessageCard = Array.from(messageCards).some(card => card.contains(e.target));
-                if (!isMessageCard) {
-                    messageDetail.classList.remove('open');
-                }
+        // Message data structure
+        const messages = [
+            {
+                id: 1,
+                inbox: 'email',
+                category: 'work',
+                tags: ['important', 'urgent'],
+                sender: 'Sarah Johnson',
+                email: 'sarah.johnson@company.com',
+                subject: 'Project deadline moved up to Friday',
+                preview: 'Project deadline moved up to Friday',
+                body: `<p>Hi there,</p>
+                    
+                    <p class="my-4">I wanted to let you know that the deadline for the client project has been moved up to this Friday instead of next Monday. The client needs the deliverables earlier because of their upcoming board meeting.</p>
+                    
+                    <p class="my-4">I know this is a tight turnaround, but I've spoken with the design team and they can adjust their schedules to prioritize this. Let me know if you'll need any additional resources to make this happen.</p>
+                    
+                    <p class="my-4">We can discuss more in tomorrow's standup, but I wanted to give you the heads up as soon as possible.</p>
+                    
+                    <p>Best,<br>
+                    Sarah</p>`,
+                time: '2h ago',
+                timestamp: Date.now() - 2 * 60 * 60 * 1000,
+                priority: 'high',
+                read: false,
+                avatarColor: 'blue',
+                avatarIcon: 'user',
+                attachments: [
+                    { name: 'Project_Brief.docx', type: 'word', icon: 'file-word' },
+                    { name: 'Timeline_Update.pdf', type: 'pdf', icon: 'file-pdf' }
+                ]
+            },
+            {
+                id: 2,
+                inbox: 'messenger',
+                category: 'work',
+                tags: ['follow-up'],
+                sender: 'Marketing Team',
+                email: 'marketing@company.com',
+                subject: 'New campaign analytics ready for review',
+                preview: 'New campaign analytics ready for review',
+                body: `<p>Hello team,</p>
+                    
+                    <p class="my-4">The analytics for our latest marketing campaign are now ready for review. Initial results look promising with a 32% increase in engagement compared to last quarter.</p>
+                    
+                    <p class="my-4">Key highlights:</p>
+                    <ul class="my-4 list-disc pl-5">
+                        <li>Email open rate: 42% (up from 28%)</li>
+                        <li>Click-through rate: 5.8% (up from 3.2%)</li>
+                        <li>Conversion rate: 2.1% (up from 1.4%)</li>
+                    </ul>
+                    
+                    <p class="my-4">Please review the attached report and let me know your thoughts before our meeting tomorrow.</p>
+                    
+                    <p>Thanks,<br>
+                    Marketing Team</p>`,
+                time: '5h ago',
+                timestamp: Date.now() - 5 * 60 * 60 * 1000,
+                priority: 'medium',
+                read: true,
+                avatarColor: 'purple',
+                avatarIcon: 'users'
+            },
+            {
+                id: 3,
+                inbox: 'email',
+                category: 'personal',
+                tags: [],
+                sender: 'Mom',
+                email: 'mom@family.com',
+                subject: 'Check out these photos from our trip!',
+                preview: 'Check out these photos from our trip!',
+                body: `<p>Hi sweetie,</p>
+                    
+                    <p class="my-4">I finally got around to organizing those photos from our trip to the mountains last month. There are some really great ones of you and the kids by the lake!</p>
+                    
+                    <p class="my-4">I've shared them in our family album - let me know which ones you'd like prints of and I'll have them made.</p>
+                    
+                    <p class="my-4">How are the kids doing with school? Did Emily like her new teacher?</p>
+                    
+                    <p class="my-4">Love,<br>
+                    Mom</p>`,
+                time: '1d ago',
+                timestamp: Date.now() - 24 * 60 * 60 * 1000,
+                priority: 'low',
+                read: false,
+                avatarColor: 'green',
+                avatarIcon: 'user'
+            },
+            {
+                id: 4,
+                inbox: 'email',
+                category: 'newsletters',
+                tags: [],
+                sender: 'Tech Digest',
+                email: 'newsletter@techdigest.com',
+                subject: 'This week\'s top tech stories - AI breakthroughs',
+                preview: 'This week\'s top tech stories - AI breakthroughs',
+                body: `<p>Tech Digest Weekly</p>
+                    
+                    <h3 class="my-4 font-bold">This Week's Top Stories</h3>
+                    
+                    <p class="my-4"><strong>1. Major AI Breakthrough:</strong> Researchers have developed a new algorithm that can learn complex tasks with significantly less training data than current models.</p>
+                    
+                    <p class="my-4"><strong>2. Quantum Computing Milestone:</strong> A team at MIT has achieved quantum supremacy with a 72-qubit processor, solving a problem in minutes that would take classical computers years.</p>
+                    
+                    <p class="my-4"><strong>3. Apple's Next Big Thing:</strong> Leaks suggest Apple is working on AR glasses with a revolutionary display technology.</p>
+                    
+                    <p class="my-4">Read more on our website or in the full newsletter attached.</p>
+                    
+                    <p>Best,<br>
+                    The Tech Digest Team</p>`,
+                time: '1d ago',
+                timestamp: Date.now() - 24 * 60 * 60 * 1000,
+                priority: 'normal',
+                read: true,
+                avatarColor: 'red',
+                avatarIcon: 'newspaper'
+            },
+            {
+                id: 5,
+                inbox: 'messenger',
+                category: 'social',
+                tags: ['meetings'],
+                sender: 'College Friends',
+                email: 'group@collegefriends.com',
+                subject: 'Reunion planning next month - who\'s coming?',
+                preview: 'Reunion planning next month - who\'s coming?',
+                body: `<p>Hey everyone!</p>
+                    
+                    <p class="my-4">We're planning our 10-year college reunion for next month (can you believe it's been 10 years already?!).</p>
+                    
+                    <p class="my-4">We've tentatively scheduled it for the weekend of the 15th at the old campus. Please let us know if you can make it so we can finalize numbers with the venue.</p>
+                    
+                    <p class="my-4">Also, we're putting together a memory book - if you have any photos from our college days you'd like to include, please send them along!</p>
+                    
+                    <p class="my-4">Can't wait to see everyone!</p>
+                    
+                    <p>The Reunion Committee</p>`,
+                time: '2d ago',
+                timestamp: Date.now() - 48 * 60 * 60 * 1000,
+                priority: 'normal',
+                read: true,
+                avatarColor: 'yellow',
+                avatarIcon: 'users'
             }
-        });
-        
-        // Initialize with first message selected
-        if (messageCards.length > 0) {
-            messageCards[0].classList.add('selected');
+        ];
+
+        // AI response templates
+        const aiResponses = {
+            'high': [
+                {
+                    type: 'suggestion',
+                    text: 'This message is marked as high priority because it contains a deadline change. Would you like me to:',
+                    actions: ['Suggest Reply', 'Calendar Alert', 'Follow Up Reminder']
+                },
+                {
+                    type: 'reply',
+                    text: 'Here\'s a suggested reply you can use or modify:',
+                    content: `Hi [Sender],
+
+Thanks for the heads up about the deadline change. I've reviewed the updated documents and will adjust my schedule accordingly to meet the Friday deadline.
+
+I may need to coordinate with the QA team to prioritize their review - could you send an email to Mark to confirm their availability?
+
+Best,
+[Your Name]`,
+                    actions: ['Use This', 'Regenerate', 'Edit']
+                }
+            ],
+            'medium': [
+                {
+                    type: 'suggestion',
+                    text: 'This message requires your review of analytics data. Would you like me to:',
+                    actions: ['Summarize Data', 'Highlight Key Metrics', 'Suggest Reply']
+                },
+                {
+                    type: 'reply',
+                    text: 'Here\'s a suggested reply you can use or modify:',
+                    content: `Hi [Sender],
+
+Thanks for sharing the campaign analytics. The results look promising, especially the 32% increase in engagement.
+
+I'll review the full report in detail before our meeting tomorrow and come prepared with any questions.
+
+Best,
+[Your Name]`,
+                    actions: ['Use This', 'Regenerate', 'Edit']
+                }
+            ],
+            'low': [
+                {
+                    type: 'suggestion',
+                    text: 'This is a personal message from family. Would you like me to:',
+                    actions: ['Suggest Reply', 'Set Reminder to Respond', 'Save Photos']
+                },
+                {
+                    type: 'reply',
+                    text: 'Here\'s a suggested reply you can use or modify:',
+                    content: `Hi Mom,
+
+Thanks for sharing the photos! They look amazing - I'll go through them this weekend and let you know which ones I'd like prints of.
+
+Emily loves her new teacher, and Jack is doing great in soccer. We should plan another trip soon!
+
+Love,
+[Your Name]`,
+                    actions: ['Use This', 'Regenerate', 'Edit']
+                }
+            ],
+            'normal': [
+                {
+                    type: 'suggestion',
+                    text: 'This message appears to be informational. Would you like me to:',
+                    actions: ['Summarize Content', 'Save for Later', 'Suggest Reply']
+                }
+            ]
+        };
+
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const messageCardsContainer = document.getElementById('messageCardsContainer');
+        const messageDetail = document.getElementById('messageDetail');
+        const messageList = document.getElementById('messageList');
+        const messageSubject = document.getElementById('messageSubject');
+        const senderName = document.getElementById('senderName');
+        const senderEmail = document.getElementById('senderEmail');
+        const messageTime = document.getElementById('messageTime');
+        const messageBody = document.getElementById('messageBody');
+        const senderAvatar = document.getElementById('senderAvatar');
+        const aiSection = document.getElementById('aiSection');
+        const aiSuggestions = document.getElementById('aiSuggestions');
+        const replyTextarea = document.getElementById('replyTextarea');
+        const sendReplyBtn = document.getElementById('sendReplyBtn');
+        const searchInput = document.getElementById('searchInput');
+        const messageListTitle = document.getElementById('messageListTitle');
+        const allMessagesCount = document.getElementById('allMessagesCount');
+        const emailCount = document.getElementById('emailCount');
+        const messengerCount = document.getElementById('messengerCount');
+        const unreadCount = document.getElementById('unreadCount');
+        const unrepliedCount = document.getElementById('unrepliedCount');
+        const toast = document.getElementById('toast');
+        const inboxButtons = document.querySelectorAll('[data-inbox]');
+        const categoryButtons = document.querySelectorAll('[data-category]');
+        const tagButtons = document.querySelectorAll('[data-tag]');
+
+        // App state
+        let currentMessageId = null;
+        let currentFilter = 'all';
+        let currentCategory = null;
+        let currentTag = null;
+        let searchQuery = '';
+        let isLoading = false;
+
+        // Initialize the app
+        function init() {
+            // Load messages from localStorage if available
+            const savedMessages = localStorage.getItem('messages');
+            if (savedMessages) {
+                messages = JSON.parse(savedMessages);
+            }
+
+            renderMessageList();
+            updateCounts();
+            addEventListeners();
+
+            // Select first message by default
+            if (messages.length > 0) {
+                selectMessage(messages[0].id);
+            }
         }
-    </script>
-</body>
-</html>
+
+        // Render the message list based on current filters
+        function renderMessageList() {
+            messageCardsContainer.innerHTML = '';
+
+            const filteredMessages = messages.filter(message => {
+                // Filter by inbox
+                if (currentFilter !== 'all' && message.inbox !== currentFilter) {
+                    return false;
+                }
+                
+                // Filter by category
+                if (currentCategory && message.category !== currentCategory) {
+                    return false;
+                }
+                
+                // Filter by tag
+                if (currentTag && (!message.tags || !message.tags.includes(currentTag))) {
+                    return false;
+                }
+                
+                // Filter by search query
+                if (searchQuery && 
+                    !message.subject.toLowerCase().includes(searchQuery) && 
+                    !message.sender.toLowerCase().includes(searchQuery) && 
+                    !message.preview.toLowerCase().includes(searchQuery)) {
+                    return false;
+                }
+                
+                return true;
+            });
+
+            // Sort by timestamp (newest first)
+            filteredMessages.sort((a, b) => b.timestamp - a.timestamp);
+
+            if (filteredMessages.length === 0) {
+                messageCardsContainer.innerHTML = `
+                    <div class="p-4 text-center text-gray-500">
+                        No messages found matching your criteria
+                    </div>
+                `;
+                return;
+            }
+
+            filteredMessages.forEach(message => {
+                const messageCard = document.createElement('div');
+                messageCard.className = `message-card priority-${message.priority} ${message.read ? '' : 'unread'}`;
+                messageCard
